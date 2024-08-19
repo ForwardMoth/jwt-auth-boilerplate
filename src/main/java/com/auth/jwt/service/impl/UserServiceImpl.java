@@ -7,6 +7,7 @@ import com.auth.jwt.repository.UserRepository;
 import com.auth.jwt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,5 +33,9 @@ public class UserServiceImpl implements UserService {
                         UserErrorMessage.USER_NOT_FOUND.getDescription(),
                         HttpStatus.NOT_FOUND)
                 );
+    }
+
+    public UserDetailsService userDetailsService() {
+        return this::getByEmail;
     }
 }
