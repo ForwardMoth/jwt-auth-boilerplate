@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum UserErrorMessage {
     EMAIL_EXISTS("User with such email exists"),
-    USER_NOT_FOUND("User with such email is not found");
+    USER_NOT_FOUND("User with such email is not found"),
+    PASSWORD_IS_NOT_SAME("Passwords are not the same");
 
     private final String description;
 }
