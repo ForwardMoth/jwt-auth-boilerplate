@@ -7,6 +7,7 @@ import com.auth.jwt.domain.enums.RoleEnum;
 import com.auth.jwt.domain.model.User;
 import com.auth.jwt.exception.CustomException;
 import com.auth.jwt.exception.message.UserErrorMessage;
+import com.auth.jwt.jwt.JwtCore;
 import com.auth.jwt.service.AuthService;
 import com.auth.jwt.service.RoleService;
 import com.auth.jwt.service.UserService;
@@ -21,6 +22,7 @@ import java.util.Objects;
 public class AuthServiceImpl implements AuthService {
     private final RoleService roleService;
     private final UserService userService;
+    private final JwtCore jwtCore;
 
     public JwtAuthResponse signUp(SignUpRequest request){
         if (!Objects.equals(request.getPassword(), request.getConfirmPassword())){
@@ -29,19 +31,23 @@ public class AuthServiceImpl implements AuthService {
 
         User user = User.builder()
                 .email(request.getEmail())
-                .password(request.getPassword())
-                .role(roleService.getByName(RoleEnum.USER)) // password encoder
+                .password(request.getPassword()) // password encoder
+                .role(roleService.getByName(RoleEnum.USER))
                 .build();
 
         userService.create(user);
-        String jwt = ""; // add jwt generate method
+        String jwt = jwtCore.generateToken(user);
         return new JwtAuthResponse(jwt);
     }
 
     public JwtAuthResponse signIn(SignInRequest request){
         // auth manager
-        // load user
-        String jwt = ""; // add jwt generate method
+
+        var user = userService
+                .userDetailsService()
+                .loadUserByUsername(request.getEmail());
+
+        String jwt = jwtCore.generateToken(user);
         return new JwtAuthResponse(jwt);
     }
 }

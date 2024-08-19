@@ -7,6 +7,7 @@ import com.auth.jwt.repository.UserRepository;
 import com.auth.jwt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,11 @@ public class UserServiceImpl implements UserService {
                         UserErrorMessage.USER_NOT_FOUND.getDescription(),
                         HttpStatus.NOT_FOUND)
                 );
+    }
+
+    public User getCurrentUser() {
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return getByEmail(email);
     }
 
     public UserDetailsService userDetailsService() {
