@@ -1,7 +1,7 @@
 package com.auth.jwt.config.seed;
 
-import com.auth.jwt.enums.RoleEnum;
-import com.auth.jwt.model.Role;
+import com.auth.jwt.domain.enums.RoleEnum;
+import com.auth.jwt.domain.model.Role;
 import com.auth.jwt.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;

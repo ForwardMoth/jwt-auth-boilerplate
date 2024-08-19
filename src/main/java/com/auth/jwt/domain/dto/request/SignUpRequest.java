@@ -1,4 +1,4 @@
-package com.auth.jwt.dto.request;
+package com.auth.jwt.domain.dto.request;
 
 import lombok.Data;
 

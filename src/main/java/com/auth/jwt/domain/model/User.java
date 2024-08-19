@@ -1,4 +1,4 @@
-package com.auth.jwt.model;
+package com.auth.jwt.domain.model;
 
 import jakarta.persistence.*;
 import lombok.Data;

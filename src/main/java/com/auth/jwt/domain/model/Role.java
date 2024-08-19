@@ -1,6 +1,6 @@
-package com.auth.jwt.model;
+package com.auth.jwt.domain.model;
 
-import com.auth.jwt.enums.RoleEnum;
+import com.auth.jwt.domain.enums.RoleEnum;
 import jakarta.persistence.*;
 import lombok.Data;
 
