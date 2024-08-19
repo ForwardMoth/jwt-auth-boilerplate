@@ -1,12 +1,16 @@
 package com.auth.jwt.jwt;
 
 import com.auth.jwt.domain.model.User;
+import com.auth.jwt.exception.CustomException;
+import com.auth.jwt.exception.message.AuthErrorMessage;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -37,9 +41,13 @@ public class JwtCore {
         return generateToken(claims, userDetails);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String email = extractEmail(token);
-        return (email.equals(userDetails.getUsername())) && !isTokenExpired(token);
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) { // more try catching
+            throw new CustomException(AuthErrorMessage.BAD_TOKEN.getDescription(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private String generateToken(Map<String, Object> claims, UserDetails userDetails){
@@ -50,10 +58,6 @@ public class JwtCore {
                 .setExpiration(getExpiration())
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {
