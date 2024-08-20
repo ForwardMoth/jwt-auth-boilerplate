@@ -6,13 +6,17 @@ import com.auth.jwt.exception.message.UserErrorMessage;
 import com.auth.jwt.repository.UserRepository;
 import com.auth.jwt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
@@ -43,5 +47,9 @@ public class UserServiceImpl implements UserService {
 
     public UserDetailsService userDetailsService() {
         return this::getByEmail;
+    }
+
+    public Optional<User> findOne(String email){
+        return userRepository.findByEmail(email);
     }
 }

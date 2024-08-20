@@ -14,7 +14,10 @@ import com.auth.jwt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(roleService.getByName(RoleEnum.USER))
+                .role(roleService.getByName(RoleEnum.USER.name()))
                 .build();
 
         userService.create(user);
@@ -46,14 +49,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public JwtAuthResponse signIn(SignInRequest request){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
-                request.getPassword()
-        ));
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),
+                    request.getPassword()
+            ));
+        } catch(BadCredentialsException e){
+            throw new CustomException(UserErrorMessage.USER_NOT_FOUND.getDescription(), HttpStatus.NOT_FOUND);
+        }
 
-        var user = userService
-                .userDetailsService()
-                .loadUserByUsername(request.getEmail());
+        User user = userService.findOne(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException(UserErrorMessage.USER_NOT_FOUND.getDescription()));
 
         String jwt = jwtCore.generateToken(user);
         return new JwtAuthResponse(jwt);

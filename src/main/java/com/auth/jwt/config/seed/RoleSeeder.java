@@ -22,9 +22,10 @@ public class RoleSeeder implements ApplicationListener<ContextRefreshedEvent> {
 
     private void loadRoles(){
         Arrays.stream(RoleEnum.values()).forEach(roleEnum -> {
-            if (!roleRepository.existsByName(roleEnum)){
+            String name = roleEnum.name();
+            if (!roleRepository.existsByName(name)){
                 Role role = new Role();
-                role.setName(roleEnum);
+                role.setName(name);
                 roleRepository.save(role);
             }
         });

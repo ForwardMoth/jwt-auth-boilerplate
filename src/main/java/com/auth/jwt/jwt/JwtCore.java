@@ -34,15 +34,6 @@ public class JwtCore {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String generateToken(UserDetails userDetails){
-        Map<String, Object> claims = new HashMap<>();
-        if (userDetails instanceof User customUserDetails) {
-            claims.put("user_id", customUserDetails.getId());
-            claims.put("role", customUserDetails.getRole().getName());
-        }
-        return generateToken(claims, userDetails);
-    }
-
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token);
@@ -53,12 +44,13 @@ public class JwtCore {
         }
     }
 
-    private String generateToken(Map<String, Object> claims, UserDetails userDetails){
+    public String generateToken(User user){
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(getExpiration())
+                .claim("user_id", user.getId())
+                .claim("role", user.getRole())
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

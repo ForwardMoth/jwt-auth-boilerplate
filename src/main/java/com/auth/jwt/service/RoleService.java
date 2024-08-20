@@ -4,5 +4,5 @@ import com.auth.jwt.domain.enums.RoleEnum;
 import com.auth.jwt.domain.model.Role;
 
 public interface RoleService {
-    Role getByName(RoleEnum roleEnum);
+    Role getByName(String role);
 }

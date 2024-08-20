@@ -34,7 +34,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = getToken(request);
         try{
-            if(token != null && jwtCore.validateToken(token)){
+            if(token != null && jwtCore.validateToken(token) && SecurityContextHolder.getContext().getAuthentication() == null){
                 var email = jwtCore.extractEmail(token);
 
                 UserDetails userDetails = userService
@@ -43,7 +43,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
-                        null,
+                        userDetails.getPassword(),
                         userDetails.getAuthorities()
                 );
 
