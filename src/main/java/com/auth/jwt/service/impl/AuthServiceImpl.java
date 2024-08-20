@@ -12,9 +12,11 @@ import com.auth.jwt.service.AuthService;
 import com.auth.jwt.service.RoleService;
 import com.auth.jwt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,7 @@ import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final RoleService roleService;
     private final UserService userService;
@@ -31,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
 
     public JwtAuthResponse signUp(SignUpRequest request){
         if (!Objects.equals(request.getPassword(), request.getConfirmPassword())){
-           throw new CustomException(UserErrorMessage.PASSWORD_IS_NOT_SAME.getDescription(), HttpStatus.BAD_REQUEST);
+            throw new CustomException(UserErrorMessage.PASSWORD_IS_NOT_SAME.getDescription(), HttpStatus.BAD_REQUEST);
         }
 
         User user = User.builder()
@@ -46,10 +49,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public JwtAuthResponse signIn(SignInRequest request){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
-                request.getPassword()
-        ));
+        try{
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),
+                    request.getPassword()
+            ));
+        }catch (AuthenticationException e){
+            throw new CustomException(UserErrorMessage.INVALID_AUTH.getDescription(), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
 
         var user = userService
                 .userDetailsService()
