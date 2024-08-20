@@ -13,6 +13,9 @@ import com.auth.jwt.service.RoleService;
 import com.auth.jwt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -23,6 +26,8 @@ public class AuthServiceImpl implements AuthService {
     private final RoleService roleService;
     private final UserService userService;
     private final JwtCore jwtCore;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     public JwtAuthResponse signUp(SignUpRequest request){
         if (!Objects.equals(request.getPassword(), request.getConfirmPassword())){
@@ -31,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = User.builder()
                 .email(request.getEmail())
-                .password(request.getPassword()) // password encoder
+                .password(passwordEncoder.encode(request.getPassword()))
                 .role(roleService.getByName(RoleEnum.USER))
                 .build();
 
@@ -41,7 +46,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public JwtAuthResponse signIn(SignInRequest request){
-        // auth manager
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                request.getEmail(),
+                request.getPassword()
+        ));
 
         var user = userService
                 .userDetailsService()
