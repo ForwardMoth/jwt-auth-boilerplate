@@ -9,6 +9,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
+@Slf4j
 public class JwtCore {
     @Value("${spring.app.secret_key}")
     private String secretKey;
@@ -45,8 +47,9 @@ public class JwtCore {
         try {
             Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) { // more try catching
-            throw new CustomException(AuthErrorMessage.BAD_TOKEN.getDescription(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (JwtException | IllegalArgumentException e) {
+            log.info("Expired or invalid jwt token");
+            throw new CustomException(AuthErrorMessage.BAD_TOKEN.getDescription(), HttpStatus.UNAUTHORIZED);
         }
     }
 
