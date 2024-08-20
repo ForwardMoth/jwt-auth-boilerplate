@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AuthErrorMessage {
-    BAD_TOKEN("Expired or invalid JWT token");
+    BAD_TOKEN("Expired or invalid JWT token"),
+    UNAUTHORIZED("User isn't unauthorized");
 
     private final String description;
 }
