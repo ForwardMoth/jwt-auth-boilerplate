@@ -4,16 +4,20 @@ import com.auth.jwt.domain.dto.request.SignInRequest;
 import com.auth.jwt.domain.dto.request.SignUpRequest;
 import com.auth.jwt.domain.dto.response.JwtAuthResponse;
 import com.auth.jwt.domain.model.User;
+import com.auth.jwt.exception.AppError;
 import com.auth.jwt.exception.CustomException;
+import com.auth.jwt.exception.message.AuthErrorMessage;
 import com.auth.jwt.exception.message.UserErrorMessage;
 import com.auth.jwt.jwt.JwtCore;
 import com.auth.jwt.service.AuthService;
 import com.auth.jwt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,20 +47,24 @@ public class AuthServiceImpl implements AuthService {
         return new JwtAuthResponse(jwt);
     }
 
-    public JwtAuthResponse signIn(SignInRequest request){
+    public ResponseEntity<?> signIn(SignInRequest request){
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     request.getEmail(),
                     request.getPassword()
             ));
         } catch(BadCredentialsException e){
-            throw new CustomException(UserErrorMessage.USER_NOT_FOUND.getDescription(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(
+                    new AppError(
+                            AuthErrorMessage.UNAUTHORIZED.getCode(),
+                            AuthErrorMessage.UNAUTHORIZED.getMsg()),
+                    AuthErrorMessage.UNAUTHORIZED.getStatus()
+            );
         }
 
-        User user = userService.findOne(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException(UserErrorMessage.USER_NOT_FOUND.getDescription()));
+        UserDetails userDetails = userService.loadUserByUsername(request.getEmail());
 
-        String jwt = jwtCore.generateToken(user);
-        return new JwtAuthResponse(jwt);
+        String jwt = jwtCore.generateToken(userDetails);
+        return ResponseEntity.ok(new JwtAuthResponse(jwt));
     }
 }

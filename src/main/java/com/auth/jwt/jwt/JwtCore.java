@@ -1,6 +1,5 @@
 package com.auth.jwt.jwt;
 
-import com.auth.jwt.domain.model.User;
 import com.auth.jwt.exception.CustomException;
 import com.auth.jwt.exception.message.AuthErrorMessage;
 import io.jsonwebtoken.Claims;
@@ -12,16 +11,13 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Duration;
+import java.util.*;
 import java.util.function.Function;
 
 @Component
@@ -30,8 +26,15 @@ public class JwtCore {
     @Value("${spring.app.secret_key}")
     private String secretKey;
 
+    @Value("${spring.app.lifetime}")
+    private Duration lifetime;
+
     public String extractEmail(String token){
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public List<?> extractRoles(String token){
+        return extractAllClaims(token).get("role", List.class);
     }
 
     public boolean validateToken(String token) {
@@ -40,25 +43,36 @@ public class JwtCore {
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             log.info("Expired or invalid jwt token");
-            throw new CustomException(AuthErrorMessage.BAD_TOKEN.getDescription(), HttpStatus.UNAUTHORIZED);
+            throw new CustomException(AuthErrorMessage.BAD_TOKEN.getMsg(), HttpStatus.UNAUTHORIZED);
         }
     }
 
-    public String generateToken(User user){
+    public String generateToken(UserDetails userDetails){
+        Map<String, Object> claims = new HashMap<>();
+        List<String> role = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+        claims.put("role", role);
+        return generateToken(claims, userDetails);
+    }
+
+    private String generateToken(Map<String, Object> claims, UserDetails userDetails){
+        Date issuedDate = getIssuedDate();
         return Jwts.builder()
-                .setSubject(user.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(getExpiration())
-                .claim("user_id", user.getId())
-                .claim("role", user.getRole())
+                .claims(claims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(issuedDate)
+                .setExpiration(getExpirationDate(issuedDate))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    private Date getExpiration(){
-        LocalDateTime now = LocalDateTime.now();
-        Instant accessExpirationInstant = now.plusMinutes(30).atZone(ZoneId.systemDefault()).toInstant();
-        return Date.from(accessExpirationInstant);
+    private Date getExpirationDate(Date issuedDate){
+        return new Date(issuedDate.getTime() + lifetime.toMillis());
+    }
+
+    private Date getIssuedDate(){
+        return new Date(System.currentTimeMillis());
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
