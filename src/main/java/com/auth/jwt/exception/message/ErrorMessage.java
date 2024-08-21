@@ -1,8 +1,14 @@
 package com.auth.jwt.exception.message;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder
-public record ErrorMessage(int code, String message) {
+@Schema(name = "Error message")
+public record ErrorMessage(
+        @Schema(description = "Error code", example = "400")
+        int code,
+        @Schema(description = "Error message", example = "BAD_REQUEST")
+        String message) {
 
 }
