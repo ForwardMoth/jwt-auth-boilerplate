@@ -3,14 +3,12 @@ package com.auth.jwt.service;
 import com.auth.jwt.domain.model.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface UserService {
-    User save(User user);
+import java.util.Optional;
 
+public interface UserService extends UserDetailsService {
     User create(User user);
 
-    User getByEmail(String email);
+    Optional<User> getByEmail(String email);
 
-    UserDetailsService userDetailsService();
-
-    User getCurrentUser();
+    Boolean isExisted(String email);
 }

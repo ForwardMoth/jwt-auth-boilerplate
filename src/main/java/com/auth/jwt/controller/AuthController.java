@@ -2,7 +2,6 @@ package com.auth.jwt.controller;
 
 import com.auth.jwt.domain.dto.request.SignInRequest;
 import com.auth.jwt.domain.dto.request.SignUpRequest;
-import com.auth.jwt.domain.dto.response.JwtAuthResponse;
 import com.auth.jwt.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +17,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<JwtAuthResponse> signUp(@RequestBody SignUpRequest request){
+    public ResponseEntity<?> signUp(@RequestBody SignUpRequest request){
         return ResponseEntity.ok(authService.signUp(request));
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<JwtAuthResponse> signIn(@RequestBody SignInRequest request){
+    public ResponseEntity<?> signIn(@RequestBody SignInRequest request){
         return ResponseEntity.ok(authService.signIn(request));
     }
 }

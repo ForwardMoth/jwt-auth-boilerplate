@@ -4,6 +4,7 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
   jpa:
+    show_sql: true
     hibernate:
       ddl-auto: update
     properties:
@@ -12,3 +13,4 @@ spring:
 
   app:
     secret_key: ${SECRET_KEY}
+    lifetime: ${LIFETIME}
