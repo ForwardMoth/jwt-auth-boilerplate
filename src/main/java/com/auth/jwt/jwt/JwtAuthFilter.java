@@ -1,6 +1,5 @@
 package com.auth.jwt.jwt;
 
-import com.auth.jwt.service.UserService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,7 +26,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     public static final String HEADER_NAME = "Authorization";
 
     private final JwtCore jwtCore;
-    private final UserService userService;
 
     @Override
     protected void doFilterInternal(

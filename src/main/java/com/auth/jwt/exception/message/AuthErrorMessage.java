@@ -12,8 +12,4 @@ public enum AuthErrorMessage {
 
     private final String msg;
     private final HttpStatus status;
-
-    public int getCode(){
-        return status.value();
-    }
 }
