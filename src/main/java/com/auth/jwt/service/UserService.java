@@ -9,4 +9,6 @@ public interface UserService extends UserDetailsService {
     User create(User user);
 
     Optional<User> getByEmail(String email);
+
+    Boolean isExisted(String email);
 }

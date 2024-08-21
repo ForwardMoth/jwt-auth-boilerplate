@@ -28,6 +28,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
+    public Boolean isExisted(String email){
+        return userRepository.existsByEmail(email);
+    }
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

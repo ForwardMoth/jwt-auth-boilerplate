@@ -17,7 +17,10 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.time.Duration;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @Component
@@ -35,16 +38,6 @@ public class JwtCore {
 
     public List<?> extractRoles(String token){
         return extractAllClaims(token).get("role", List.class);
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            log.info("Expired or invalid jwt token");
-            throw new CustomException(AuthErrorMessage.BAD_TOKEN.getMsg(), HttpStatus.UNAUTHORIZED);
-        }
     }
 
     public String generateToken(UserDetails userDetails){
