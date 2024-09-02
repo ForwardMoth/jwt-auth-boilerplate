@@ -11,4 +11,6 @@ public interface UserService extends UserDetailsService {
     Optional<User> getByEmail(String email);
 
     Boolean isExisted(String email);
+
+    User findByEmail(String email);
 }

@@ -1,6 +1,7 @@
 package com.auth.jwt.controller;
 
 import com.auth.jwt.controller.api.AuthApi;
+import com.auth.jwt.domain.dto.request.JwtRefreshTokenRequest;
 import com.auth.jwt.domain.dto.request.SignInRequest;
 import com.auth.jwt.domain.dto.request.SignUpRequest;
 import com.auth.jwt.domain.dto.response.JwtAuthResponse;
@@ -20,12 +21,19 @@ public class AuthController implements AuthApi {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<JwtAuthResponse> signUp(@RequestBody @Valid SignUpRequest request){
+    public ResponseEntity<JwtAuthResponse> signUp(@RequestBody @Valid SignUpRequest request) {
         return ResponseEntity.ok(authService.signUp(request));
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<JwtAuthResponse> signIn(@RequestBody @Valid SignInRequest request){
+    public ResponseEntity<JwtAuthResponse> signIn(@RequestBody @Valid SignInRequest request) {
         return ResponseEntity.ok(authService.signIn(request));
     }
+
+    @PostMapping("/refresh")
+    @Override
+    public ResponseEntity<JwtAuthResponse> refresh(JwtRefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refresh(request));
+    }
+
 }

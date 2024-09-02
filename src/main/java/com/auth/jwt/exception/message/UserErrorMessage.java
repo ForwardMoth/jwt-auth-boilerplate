@@ -9,5 +9,5 @@ public enum UserErrorMessage {
     EMAIL_EXISTS("User with such email exists"),
     PASSWORD_IS_NOT_SAME("Passwords are not the same");
 
-    private final String description;
+    private final String message;
 }

@@ -1,8 +1,10 @@
 package com.auth.jwt.controller.api;
 
+import com.auth.jwt.domain.dto.request.JwtRefreshTokenRequest;
 import com.auth.jwt.domain.dto.request.SignInRequest;
 import com.auth.jwt.domain.dto.request.SignUpRequest;
 import com.auth.jwt.domain.dto.response.JwtAuthResponse;
+import com.auth.jwt.exception.message.BadRequestMessage;
 import com.auth.jwt.exception.message.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -58,4 +60,25 @@ public interface AuthApi {
     })
     @Operation(summary = "Login user")
     ResponseEntity<JwtAuthResponse> signIn(@RequestBody @Valid SignInRequest request);
+
+    @Operation(summary = "Refresh access token")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successful registration",
+                    content = {@Content(schema = @Schema(
+                            implementation = JwtAuthResponse.class),
+                            mediaType = "application/json"
+                    )}
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Bad Request",
+                    content = {@Content(
+                            schema = @Schema(implementation = BadRequestMessage.class),
+                            mediaType = "application/json"
+                    )}
+            )
+    })
+    ResponseEntity<JwtAuthResponse> refresh(@RequestBody @Valid JwtRefreshTokenRequest request);
 }
