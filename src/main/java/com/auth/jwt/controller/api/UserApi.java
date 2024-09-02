@@ -1,6 +1,6 @@
 package com.auth.jwt.controller.api;
 
-import com.auth.jwt.exception.message.ErrorMessage;
+import com.auth.jwt.exception.message.record.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

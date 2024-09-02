@@ -1,6 +1,6 @@
 package com.auth.jwt.jwt;
 
-import com.auth.jwt.exception.message.ErrorMessage;
+import com.auth.jwt.exception.message.record.ErrorMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
